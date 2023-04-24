@@ -18,6 +18,26 @@ db.init_app(app)
 def home():
     return '<h1>Bakery GET-POST-PATCH-DELETE API</h1>'
 
+@app.route('/baked_goods/<int:id>', methods=['DELETE'])
+def delete_good(id):
+    db.session.delete(BakedGood.query.filter(BakedGood.id == id).first())
+    db.session.commit()
+    return make_response(jsonify({"r": "OK"}), 200)
+
+@app.route('/bakeries/<int:id>', methods=['PATCH'])
+def patch_bakery(id):
+    bakery = Bakery.query.filter(Bakery.id == id).first()
+    for attr in request.form:
+        setattr(bakery, attr, request.form.get(attr))
+    db.session.commit()
+    return make_response( jsonify({"r": "OK"}), 200)
+
+@app.route('/baked_goods', methods=['POST'])
+def create_good():
+    db.session.add(BakedGood(name=request.form.get('name'), price=request.form.get('price')))
+    db.session.commit()
+    return make_response(jsonify({"response": "OK"}), 201)
+
 @app.route('/bakeries')
 def bakeries():
 
